@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de SOR{% endblock %}
+
+{% block content %}
+<h1 class="title text-gray-900 display-4">Método de SOR</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método SOR es un método iterativo para resolver sistemas de ecuaciones lineales que es una variación del método de Gauss-Seidel. En este método, se introduce un factor de relajación, w, que puede acelerar la convergencia.</p>
+    <p><strong><b>Recuerda:</b></strong> Asegúrate de que tu matriz sea invertible y diagonal dominante. Además, si tu matriz tiene algún cero, debes ponerlo explícitamente y no dejar el campo en blanco.</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form id="tamanioForm" class="form-inline mb-3" action="{% url 'sor' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group mr-2">
+            <label for="filas" class="mr-2">Ingrese la cantidad de filas y columnas para su matriz:</label>
+            <input type="number" id="filas" name="filas" min="1" class="form-control" required>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="generarMatrizA(); generarMatrizb(); generarMatrizx0();" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Generar Matriz</button>
+        </div>
+    </form>
+
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <h4>Matriz A</h4>
+                <table id="matrizInput" class="table table-bordered">
+                    <!-- La tabla se generará dinámicamente con JavaScript -->
+                </table>
+            </div>
+            <div class="col-md-4">
+                <h4>Vector b</h4>
+                <table id="matrizInputB" class="table table-bordered">
+                    <!-- La tabla se generará dinámicamente con JavaScript -->
+                </table>
+            </div>
+            <div class="col-md-4">
+                <h4>Vector x0</h4>
+                <table id="matrizInputx0" class="table table-bordered">
+                    <!-- La tabla se generará dinámicamente con JavaScript -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <form id="formMatrices" action="{% url 'sor' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="filas" id="filas-hidden">
+        <input type="hidden" name="matrizA" id="matrizA">
+        <input type="hidden" name="matrizB" id="matrizB">
+        <input type="hidden" name="matrizX0" id="matrizX0">
+        <div class="form-row">
+            <div class="text-center">
+                <div class="form-group col">
+                    <label for="tolerancia">Tolerancia:</label>
+                    <input type="number" id="tol" name="tol" step="any" class="form-control" placeholder="Tol" required>
+                </div>
+                <br>
+                <div class="form-group col">
+                    <label for="iteraciones">Núm. de Iteraciones:</label>
+                    <input type="number" id="niter" name="niter" class="form-control" placeholder="Niter" required>
+                </div>
+                <br>
+                <div class="form-group col">
+                    
+                    <p class="subtitle text-gray-700 display-6">El tipo de error está dado por 0 para error absoluto y 1 para error relativo. Ingrese el que corresponda, al ingresar un valor invalido por defecto se tomará el error absoluto</p>
+                    <input type="number" id="error" name="error" class="form-control" placeholder="Tipo de error" required>
+                </div>
+                <br>
+                <div class="form-group col">
+                    <label for="w">Factor de Relajación (w):</label>
+                    <input type="number" id="w" name="w" step="any" class="form-control" placeholder="w" required>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="guardarMatrices();" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Ejecutar Método</button>
+        </div>
+    </form>
+<br>
+<br>
+    {% if resultado %}
+    <div class="text-center">
+        <h3><b>Resultado</b></h3>
+        <p>{{ resultado }}</p>
+        <p><strong>El radio espectral de la matriz de transición es: </strong> {{ radio }}</p>
+    </div>
+    <br>
+    <div class="text-center">
+        {% if grafica %}
+        <div class="text-center mt-4">
+            <h3><b>Gráfica de Convergencia</b></h3>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica de Convergencia">
+        </div>
+        {% endif %}
+    </div>
+<br>
+<div class="text-center">
+        <h3><b>Tabla de Iteraciones</b></h3>
+</div>
+        <table class="table table-bordered" id="tablaDatos">
+            <thead>
+                <tr>
+                    <th>Iteración</th>
+                    <th>x</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.Iteracion }}</td>
+                    <td>{{ row.x }}</td>
+                    <td>{{ row.Error }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center">
+        <a href="data:text/csv;base64,{{ csv }}" download="sor_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+        </div>
+        
+    {% endif %}
+</div>
+
+<script src="{% static 'js/gs.js' %}"></script>
+
+{% endblock %}

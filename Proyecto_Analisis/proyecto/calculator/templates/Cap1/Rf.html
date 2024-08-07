@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de la Regla Falsa{% endblock %}
+
+{% block content %}
+
+<h1 class="title text-gray-900 display-4">Método de la Regla Falsa</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método de la regla falsa es un método iterativo que consiste en construir una recta que pasa por dos puntos del intervalo que contiene la raíz de la ecuación. La intersección de esta recta con el eje x es una aproximación a la raíz.</p>
+    <p>Recuerda usar la <strong>SINTAXIS DE PYTHON</strong> para rellenar los campos y se sugiere un máximo de 100 Iteraciones.</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="{% url 'rf' %}" method="POST" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" name="func" class="form-control" placeholder="Función">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="x0" class="form-control" placeholder="a">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="x1" class="form-control" placeholder="b">
+        </div>
+        <div class="mb-3">
+            <input type="text" name="Tol" class="form-control" placeholder="Tolerancia">
+        </div>
+        <div class="mb-3">
+            <input type="number" name="niter" class="form-control" placeholder="Iteraciones" min="0" max="100">
+        </div>
+        
+        <div class="text-center">
+            <input type="submit" value="Ejecutar" class="btn btn-primary mt-3" style="background-color: #db3f59; border-color: #db3f59">
+        </div>
+    </form>
+</div>
+
+<div class="container mt-5">
+    {% if resultado %}
+        <div class="text-center">
+        <h2><b>Resultado</b></h2>
+        <p>{{ resultado }}</p>
+        </div>
+
+        <br>
+        {% if grafica %}
+            <div class="text-center">
+            <h3><b>Gráfica de la función</b></h3>
+            <br>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica">
+            </div>
+        {% endif %}
+        <br>
+        <br>
+        {% if data %}
+            <div class="text-center">
+            <h3><b>Tabla de Resultados</b></h3>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Iteración</th>
+                        <th>xm</th>
+                        <th>xi</th>
+                        <th>xs</th>
+                        <th>f(xm)</th>
+                        <th>f(xi)</th>
+                        <th>f(xs)</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.Iteration }}</td>
+                        <td>{{ row.xm }}</td>
+                        <td>{{ row.xi }}</td>
+                        <td>{{ row.xs }}</td>
+                        <td>{{ row.fx_m }}</td>
+                        <td>{{ row.fx_i }}</td>
+                        <td>{{ row.fx_s }}</td>
+                        <td>{{ row.Error }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <a href="data:text/csv;base64,{{ csv }}" download="regla_falsa_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

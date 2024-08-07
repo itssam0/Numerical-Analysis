@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Bisección{% endblock %}
+
+{% block content %}
+
+    <h1 class="title text-gray-900 display-4">Método de Bisección</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método de bisección es un algoritmo de búsqueda de raíces que trabaja dividiendo el intervalo a la mitad y seleccionando el subintervalo que tiene la raíz.<br> Esto se logra llevar a cabo a través de varias iteraciones que son aplicadas en un intervalo para por medio de ello encontrar la raíz de la función.</p>
+    <p>Asegúrate de que ( f ) es una función continua en el intervalo [a, b].</p>
+    <p><b><b>Símbolos de uso:</b></b> <br>Manejo de sintaxis de python <br> Para exponentes utiliza <b>' ** '</b> <br> Para el número euler utiliza <b>'math.exp()'</b> <br> Para logaritmo natural utiliza <b>'log()'</b> <br> Para valor absoluto utiliza <b>'abs()'</b>.</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="" method="POST" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" name="func" class="form-control" placeholder="Función">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="xi" class="form-control" placeholder="a">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="xs" class="form-control" placeholder="b">
+        </div>
+        <div class="mb-3">
+            <input type="text" name="tol" class="form-control" placeholder="Tolerancia">
+        </div>
+        <div class="mb-3">
+            <input type="number" name="iteraciones" class="form-control" placeholder="Iteraciones">
+        </div>
+        <div class="text-center">
+            <input type="submit" value="Ejecutar" class="btn btn-primary mt-3" style="background-color: #db3f59; border-color: #db3f59">
+        </div>
+    </form>
+</div>
+
+<div class="container mt-5">
+    {% if resultado %}
+        <div class="text-center">
+            <h2><b>Resultado</b></h2>
+            <p>{{ resultado }}</p>
+        </div>
+        <br>
+
+        {% if grafica %}
+            <div class="text-center">
+                <h3><b>Gráfica de la función</b></h3>
+                <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica">
+            </div>
+        {% endif %}
+        <br>
+        <br>
+        {% if data %}
+        <div class="text-center">
+            <h3><b>Tabla de Resultados</b></h3>
+            <br>
+        </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Iteration</th>
+                        <th>a</th>
+                        <th>Xi</th>
+                        <th>b</th>
+                        <th>f(xi)</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.Iteration }}</td>
+                        <td>{{ row.a }}</td>
+                        <td>{{ row.xi }}</td>
+                        <td>{{ row.b }}</td>
+                        <td>{{ row.f_xi }}</td>
+                        <td>{{ row.Error }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <a href="data:text/csv;base64,{{ csv }}" download="biseccion_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

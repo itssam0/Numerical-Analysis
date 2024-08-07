@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Spline Cúbico
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="title text-gray-900 display-4">Método de Spline Cúbico</h1>
+    <div class="subtitle text-gray-700 display-6">
+        Con este método podremos hallar la aproximación de un polinomio que pasa por los puntos obtenidos...
+    </div>
+    <br>
+    <div class="subtitle text-gray-700 display-6">
+        Tener en cuenta que se debe ingresar un conjunto de puntos en orden ascendente antes de correr...
+    </div>
+    <br>
+    <div class="subtitle text-gray-700 display-6">
+        El conjunto de coordenadas <b>x</b> y <b>y</b> deben ir separados por comas...
+    </div>
+    <br>
+    <div class="container-fluid col">
+        <br>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="card" style="margin: 2em;">
+                    <form action="{% url 'spline_cubico' %}" method="post" class="container">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <br>
+                            <label for="funcion" class="form-label">Conjunto de x</label>
+                            <input type="text" class="form-control" name="x" aria-describedby="info" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inicioInt" class="form-label">Conjunto de y</label>
+                            <input type="text" class="form-control" name="y" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Calcular</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <h2 style="margin:0.5em;"><b>Gráfica</b></h2>
+            </div>
+            {% if grafica %}
+            <div class="container-fluid col-md-6">
+                <img class="w-100 h-100 object-fit-scale" alt="Gráfica de la función" src="data:image/png;base64,{{ grafica }}">
+            </div>
+            {% endif %}
+            
+            <div class="text-center">
+                <h2 style="margin:0.5em;"><b>Polinomio</b></h2>
+                <p style="margin-left: 2em;">Los polinomios se mostrarán: a*x^3 + b*x^2 + c*x + d</p>
+            </div>
+            <div class="card" style="margin:1em;">
+                <div class="container">
+                {% if tabla %}
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Segmento</th>
+                            {% for col in columnas %}
+                            <th scope="col">{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in tabla %}
+                        <tr>
+                            <td>{{ forloop.counter0 }}</td>
+                            {% for d in row %}
+                            <td>{{ d }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-center mt-3">
+                    <a href="data:text/csv;base64,{{ csv }}" download="spline_cubico_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+                </div>
+                {% endif %}
+            </div>    
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

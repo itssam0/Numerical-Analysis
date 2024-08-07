@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Newton{% endblock %}
+
+{% block content %}
+
+<h1 class="title text-gray-900 display-4">Método de Newton</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método de Newton es un algoritmo para encontrar aproximaciones a las raíces (o ceros) de una función real.</p>
+    <p>Se ingresa la función, el valor inicial (x0), la tolerancia del error (Tol) y el máximo número de iteraciones.</p>
+    <p>El método se basa en tomar un punto inicial (x0), dibujar una línea tangente en ese punto y utilizar la intersección de esa línea con el eje (x) como el próximo punto (x1), y repetir el proceso.</p>
+    <p><b><b>Para tener en cuenta:</b></b> La función (f) debe ser derivable, su derivada debe ser diferente de 0, y no se debe calcular cerca de mínimos y máximos locales.</p>
+    <p><b><b>Símbolos de uso:</b></b> <br>Manejo de sintaxis de python <br> Para exponentes utiliza <b>' ** '</b> <br> Para el número euler utiliza <b>'math.exp()'</b> <br> Para logaritmo natural utiliza <b>'log()'</b> <br> Para valor absoluto utiliza <b>'abs()'</b>.</p>
+</div>
+
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="{% url 'newton' %}" method="post" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="funcion" class="form-label">Función (f(x))</label>
+            <input type="text" class="form-control" id="funcion" name="funcion" aria-describedby="info" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="x0" class="form-label">Valor inicial (x0)</label>
+            <input type="text" class="form-control" id="x0" name="x0" required>
+        </div>
+        <div class="mb-3">
+            <label for="tolerancia" class="form-label">Tolerancia</label>
+            <input type="text" class="form-control" id="tolerancia" name="tolerancia" required>
+        </div>
+        <div class="mb-3">
+            <label for="niter" class="form-label">Cantidad máxima de iteraciones</label>
+            <input type="text" class="form-control" id="niter" name="niter" required>
+        </div>
+        <div class="text-center">
+            <button id="calculateBtn" type="submit" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Calcular</button>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+    {% if resultado %}
+        <div class="text-center">
+            <h2><b>Resultado</b></h2>
+            <p>{{ resultado }}</p>
+        </div>
+        <br>
+
+        {% if grafica %}
+            <div class="text-center">
+                <h3><b>Gráfica de la función</b></h3>
+                <br>
+                <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica">
+            </div>
+        {% endif %}
+        <br>
+        {% if data %}
+        <hr>
+            <div class="text-center">
+                <h3><b>Tabla de Iteraciones</b></h3>
+                <br>
+            </div>
+
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Iteración</th>
+                        <th>x</th>
+                        <th>f(x)</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.Iteration }}</td>
+                        <td>{{ row.x }}</td>
+                        <td>{{ row.f_x }}</td>  <!-- Cambia 'row["f(x)"]' a 'row.f_x' -->
+                        <td>{{ row.Error }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <a href="data:text/csv;base64,{{ csv }}" download="newton_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

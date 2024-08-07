@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de la Secante{% endblock %}
+
+{% block content %}
+
+<h1 class="title text-gray-900 display-4">Método de la Secante</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método numérico de la secante es un método iterativo que se utiliza para encontrar las raíces de una función. El método comienza con dos puntos iniciales, a y b, y luego calcula el punto medio de la secante que pasa por estos dos puntos. Este punto medio se utiliza como el nuevo punto inicial para la siguiente iteración. El proceso se repite hasta que se alcanza la raíz deseada.</p>
+    <p>Recuerda usar la <strong>SINTAXIS DE PYTHON</strong> para rellenar los campos.</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="{% url 'secante' %}" method="POST" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" name="func" class="form-control" placeholder="Función">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="x0" class="form-control" placeholder="a">
+        </div>
+        <div class="mb-3">
+            <input step="any" type="number" name="x1" class="form-control" placeholder="b">
+        </div>
+        <div class="mb-3">
+            <input type="text" name="Tol" class="form-control" placeholder="Tolerancia">
+        </div>
+        <div class="mb-3">
+            <input type="number" name="niter" class="form-control" placeholder="Iteraciones">
+        </div>
+        
+        <div class="text-center">
+            <input type="submit" value="Ejecutar" class="btn btn-primary mt-3" style="background-color: #db3f59; border-color: #db3f59">
+        </div>
+    </form>
+</div>
+
+<div class="container">
+    {% if resultado %}
+    <div class="text-center">
+        <h2><b>Resultado</b></h2>
+        <p>{{ resultado }}</p>
+    </div>
+    <br>
+        {% if grafica %}
+        <div class="text-center">
+            <h3><b>Gráfica de la función</b></h3>
+            <br>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica">
+        </div>
+        <br>
+        <br>
+
+        {% endif %}
+        {% if data %}
+        <div class="text-center">
+            <h3><b>Tabla de Resultados</b></h3>
+        </div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Iteración</th>
+                        <th>xn</th>
+                        <th>f(xn)</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.Iteration }}</td>
+                        <td>{{ row.xn }}</td>
+                        <td>{{ row.f_xn }}</td>
+                        <td>{{ row.Error }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+            <a href="data:text/csv;base64,{{ csv }}" download="secante_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Interpolación de Lagrange{% endblock %}
+
+{% block content %}
+<h1 class="title text-gray-900 display-4">Método de Interpolación de Lagrange</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método de interpolación de Lagrange es un método para encontrar el polinomio de interpolación que pasa por un conjunto de puntos dados.</p>
+    <p><strong><b>Recuerda:</b></strong> Debes ingresar por lo menos dos puntos para la ejecución de este método. Intenta no utilizar puntos repetidos ya que esto podría generar resultados inesperados en el polinomio.</p>
+    <p>No dejar ningun campo vacio de lo contrario fallara la ejecución</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form id="tamanioForm" class="form-inline mb-3" action="{% url 'lagrange' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group mr-2">
+            <label for="cantidadDatos" class="mr-2">Cantidad de datos:</label>
+            <input type="number" id="cantidadDatos" name="cantidadDatos" min="2" class="form-control" required>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="generarVectorx(); generarVectory();" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Generar</button>
+        </div>
+    </form>
+
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Vector X</h4>
+                <table id="vectorx" class="table table-bordered">
+                    <!-- La tabla se generará dinámicamente con JavaScript -->
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h4>Vector Y</h4>
+                <table id="vectory" class="table table-bordered">
+                    <!-- La tabla se generará dinámicamente con JavaScript -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <form id="formVectors" action="{% url 'lagrange' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="vectorx" id="vectorx-hidden">
+        <input type="hidden" name="vectory" id="vectory-hidden">
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="guardarMatrices();" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Ejecutar Método</button>
+        </div>
+    </form>
+<br>
+    {% if polinomio %}
+    <div class="text-center">
+        <h3><b>Polinomio Resultante</b></h3>
+        <p>{{ polinomio }}</p>
+    </div>
+    {% endif %}
+
+    {% if grafica %}
+        <div class="text-center mt-4">
+            <h3><b>Gráfica del Polinomio</b></h3>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica del Polinomio de Lagrange">
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function generarVectorx() {
+    var filas = parseInt(document.getElementById("cantidadDatos").value);
+    var tabla = document.getElementById("vectorx");
+
+    tabla.innerHTML = '';
+    var fila = tabla.insertRow(0);
+    for (var j = 0; j < filas; j++) {
+        var celda = fila.insertCell(j);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.name = "dato[" + j + "]";
+        input.className = "form-control";
+        celda.appendChild(input);
+    }
+}
+
+function generarVectory() {
+    var filas = parseInt(document.getElementById("cantidadDatos").value);
+    var tabla = document.getElementById("vectory");
+
+    tabla.innerHTML = '';
+    var fila = tabla.insertRow(0);
+    for (var j = 0; j < filas; j++) {
+        var celda = fila.insertCell(j);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.name = "dato[" + j + "]";
+        input.className = "form-control";
+        celda.appendChild(input);
+    }
+}
+
+function guardarMatrices() {
+    var vectorx = obtenerVector('vectorx');
+    var vectory = obtenerVector('vectory');
+
+    document.getElementById("vectorx-hidden").value = JSON.stringify(vectorx);
+    document.getElementById("vectory-hidden").value = JSON.stringify(vectory);
+
+    document.getElementById("formVectors").submit();
+}
+
+function obtenerVector(tablaId) {
+    var matriz = [];
+    var filas = document.getElementById(tablaId).rows.length;
+
+    for (var i = 0; i < filas; i++) {
+        var fila = document.getElementById(tablaId).rows[i];
+        var columnas = fila.cells.length;
+        var filaMatriz = [];
+
+        for (var j = 0; j < columnas; j++) {
+            var valor = fila.cells[j].getElementsByTagName("input")[0].value;
+            filaMatriz.push(parseFloat(valor));
+        }
+
+        matriz.push(filaMatriz);
+    }
+
+    return matriz[0];
+}
+
+// Función para obtener el valor del token CSRF de la cookie
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Gauss-Seidel y Jacobi{% endblock %}
+
+{% block content %}
+<h1 class="title text-gray-900 display-4">Método de Gauss-Seidel y Jacobi</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p><strong><b>Jacobi:</b></strong> es un método iterativo para resolver sistemas de ecuaciones lineales más simple y se aplica sólo a sistemas cuadrados, es decir, a sistemas con tantas incógnitas como ecuaciones.</p>
+    <p><strong><b>Gauss-Seidel:</b></strong> es muy semejante al método de Jacobi. Mientras que en el de Jacobi se utiliza el valor de las incógnitas para determinar una nueva aproximación, en el de Gauss-Seidel se va utilizando los valores de las incógnitas recién calculados en la misma iteración, y no en la siguiente.</p>
+    <p><strong><b> Recuerda! Para garantizar la convergencia de los métodos:</b></strong>
+        <ul>
+            <p> El radio espectral de la matriz de transición debe ser menor a 1.</p>
+            <p> Es recomendable que la matriz A sea predominantemente diagonal dominante.</p>
+            <p> Los espacios en blanco que dejes en la matriz y vectores, tienen que ser rellenados con ceros.</p>
+        </ul>
+    </p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form id="tamanioForm" class="form-inline mb-3" action="{% url 'gauss_seidel' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group mr-2">
+            <label for="filas" class="mr-2">Tamaño de la matriz: </label>
+            <input type="number" id="filas" name="filas" min="1" class="form-control" required>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="generarMatrizA(); generarMatrizb(); generarMatrizx0();" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Generar Matriz</button>
+        </div>
+    </form>
+
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col-md-5">
+                <h4>Matriz A</h4>
+            </div>
+            <div class="col-md-5">
+                <h4>Vector b</h4>
+            </div>
+            <div class="col-md-2">
+                <h4>Vector x0</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <table id="matrizInput" class="table table-bordered">
+                <!-- La tabla se generará dinámicamente con JavaScript -->
+            </table>
+        </div>
+        <div class="col-md-4">
+            <table id="matrizInputB" class="table table-bordered">
+                <!-- La tabla se generará dinámicamente con JavaScript -->
+            </table>
+        </div>
+        <div class="col-md-4">
+            <table id="matrizInputx0" class="table table-bordered">
+                <!-- La tabla se generará dinámicamente con JavaScript -->
+            </table>
+        </div>
+    </div>
+
+    <form id="formMatrices" action="{% url 'gauss_seidel' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="filas" id="filas-hidden">
+        <input type="hidden" name="matrizA" id="matrizA">
+        <input type="hidden" name="vectorb" id="vectorb">
+        <input type="hidden" name="vectorx0" id="vectorx0">
+        <div class="form-row">
+            <div class="text-center">
+                <div class="form-group col">
+                    <label for="tolerancia">Tolerancia:</label>
+                    <input type="number" id="tolerancia" name="tolerancia" step="any" class="form-control" placeholder="Tol" required>
+                </div>
+                <br>
+                <div class="form-group col">
+                    <label for="iteraciones">Núm. de Iteraciones:</label>
+                    <input type="number" id="niter" name="niter" class="form-control" placeholder="Niter" required>
+                </div>
+                <br>
+                <div class="form-group col">
+                    <label for="met">Método a utilizar, 0 es Jacobi, 1 es Gauss-Seidel</label>
+                    <input type="number" id="met" name="met" class="form-control" placeholder="Método" required>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="text-center">
+            <button type="button" onclick="guardarMatrices();" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Ejecutar Método</button>
+        </div>
+    </form>
+<br>
+<br>
+    {% if resultado %}
+    <div class="text-center">
+        <h3><b>Resultado</b></h3>
+        <p>{{ resultado }}</p>
+        <p><strong>El radio espectral de la matriz de transición es: </strong> {{ radio }}</p>
+    </div>
+
+    {% if grafica %}
+        <div class="text-center mt-4">
+            <h3><b>Gráfica de Convergencia</b></h3>
+            <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica de Convergencia">
+        </div>
+        {% endif %}
+        <br>
+        <div class="text-center">
+        <h3><b>Tabla de Iteraciones</b></h3>
+        </div>
+        <table class="table table-bordered" id="tablaDatos">
+            <thead>
+                <tr>
+                    <th>Iteración</th>
+                    <th>x</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.Iteracion }}</td>
+                    <td>{{ row.x }}</td>
+                    <td>{{ row.Error }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center">
+            <a href="data:text/csv;base64,{{ csv }}" download="gauss_seidel_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+        </div>
+        
+    {% endif %}
+</div>
+
+<script src="{% static 'js/jacobi.js' %}"></script>
+
+{% endblock %}

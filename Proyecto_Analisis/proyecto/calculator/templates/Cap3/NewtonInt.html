@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Newton Interpolante{% endblock %}
+
+{% block content %}
+<h1 class="title text-gray-900 display-4">Método de Newton Interpolante</h1>
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método de interpolación de Newton es un método para encontrar el polinomio de interpolación que pasa por un conjunto de puntos dados.</p>
+    <p><strong>Recuerda:</strong> Debes ingresar por lo menos dos puntos para la ejecución de este método.</p>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form id="formularioPuntos" method="post" action="{% url 'newtonint' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="cantidadPuntos">Cantidad de Puntos:</label>
+            <input type="number" class="form-control" id="cantidadPuntos" name="cantidadPuntos" min="2" required>
+        </div>
+        <br>
+        <button type="button" class="btn btn-primary" onclick="agregarCampos()" style="background-color: #db3f59; border-color: #db3f59">Agregar Campos</button>
+        
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>Coordenada X</h5>
+                </div>
+                <div class="col-md-4">
+                    <h5>Coordenada Y</h5>
+                </div>
+            </div>
+        </div>
+
+        <div id="camposPuntos" class="mt-3">
+            <!-- Aquí se agregarán los campos dinámicamente -->
+        </div>
+
+        <input type="hidden" name="vectorx" id="vectorx-hidden">
+        <input type="hidden" name="vectory" id="vectory-hidden">
+        
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-success mt-3" onclick="guardarPuntos()" style="background-color: #db3f59; border-color: #db3f59">Enviar Puntos</button>
+        </div>
+    </form>
+<br>
+<hr>
+    {% if polinomio %}
+    <div class="text-center">
+        <h3><b>Resultado</b></h3>
+        <h5>El polinomio de Newton es: <b>{{ polinomio }}</b></h5>
+    </div>
+        <table id="tabla-diferencias-divididas" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                    {% for col in columnas %}
+                    <th>Diferencia Dividida {{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in tabla %}
+                <tr>
+                    {% for valor in fila %}
+                    <td>{{ valor }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center">
+        <div class="mt-4">
+            <a href="data:text/csv;base64,{{ csv }}" download="newton_interpolante_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+        </div>
+    </div>
+
+    <br>
+    <hr>
+            <div class="text-center">
+                <h3><b>Gráfica del Polinomio</b></h3>
+                <div class="text-center">
+                <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Imagen">
+            </div>
+            </div>
+    {% endif %}
+</div>
+
+<script>
+function agregarCampos() {
+    var cantidad = parseInt(document.getElementById("cantidadPuntos").value);
+    var container = document.getElementById("camposPuntos");
+
+    container.innerHTML = '';
+    for (var i = 0; i < cantidad; i++) {
+        var row = document.createElement("div");
+        row.className = "row mb-2";
+        
+        var colX = document.createElement("div");
+        colX.className = "col-md-3";
+        var inputX = document.createElement("input");
+        inputX.type = "number";
+        inputX.name = "x" + i;
+        inputX.className = "form-control";
+        colX.appendChild(inputX);
+
+        var colY = document.createElement("div");
+        colY.className = "col-md-4";
+        var inputY = document.createElement("input");
+        inputY.type = "number";
+        inputY.name = "y" + i;
+        inputY.className = "form-control";
+        colY.appendChild(inputY);
+
+        row.appendChild(colX);
+        row.appendChild(colY);
+        container.appendChild(row);
+    }
+}
+
+function guardarPuntos() {
+    var cantidad = parseInt(document.getElementById("cantidadPuntos").value);
+    var vectorx = [];
+    var vectory = [];
+
+    for (var i = 0; i < cantidad; i++) {
+        var x = parseFloat(document.getElementsByName("x" + i)[0].value);
+        var y = parseFloat(document.getElementsByName("y" + i)[0].value);
+        vectorx.push(x);
+        vectory.push(y);
+    }
+
+    document.getElementById("vectorx-hidden").value = JSON.stringify(vectorx);
+    document.getElementById("vectory-hidden").value = JSON.stringify(vectory);
+    document.getElementById("formularioPuntos").submit();
+}
+</script>
+
+{% endblock %}

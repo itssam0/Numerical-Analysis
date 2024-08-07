@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Método de Punto Fijo{% endblock %}
+
+{% block content %}
+
+    <h1 class="title text-gray-900 display-4">Método de Punto Fijo</h1>
+
+
+<div class="subtitle text-gray-700 display-6">
+    <p>El método del punto fijo es un método iterativo que permite resolver sistemas de ecuaciones no necesariamente lineales. En particular, se puede utilizar para determinar raíces de una función de la forma f(x), siempre y cuando se cumplan los criterios de convergencia.</p>
+    <h6>Recuerda que para que este método converja es necesario que |g'(x)| < 1 y que el valor ingresado en x0 esté cerca del punto fijo.</h6>
+    <h6>Recuerda utilizar la sintaxis de Python con un máximo de 100 iteraciones.</h6>
+</div>
+<br>
+
+<div class="container">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form action="" method="POST" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="text" name="funcg" class="form-control" placeholder="Función g(x)" required>
+        </div>
+        <div class="mb-3">
+            <input type="number" name="x0" class="form-control" placeholder="Valor inicial (x0)" required>
+        </div>
+        <div class="mb-3">
+            <input type="text" name="Tol" class="form-control" placeholder="Tolerancia" required>
+        </div>
+        <div class="mb-3">
+            <input type="number" name="niter" class="form-control" placeholder="Número máximo de iteraciones" required>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary" style="background-color: #db3f59; border-color: #db3f59">Ejecutar</button>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+    {% if resultado %}
+    <div class="text-center">
+    <h2><b>Resultado</b></h2>
+    <p>{{ resultado }}</p>
+    </div>
+
+    <br>
+
+    {% if grafica %}
+    <div class="text-center">
+        <h3><b>Gráfica de la función</b></h3>
+        <br>
+        <img src="data:image/png;base64,{{ grafica }}" class="img-fluid" alt="Gráfica">
+    </div>
+    {% endif %}
+
+    <br>
+    <br>
+
+    {% if data %}
+    <div class="text-center">
+        <h3><b>Tabla de Resultados</b></h3>
+    </div>
+        <table class="table table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>Iteración</th>
+                    <th>xi</th>
+                    <th>f(xi)</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row.Iteration }}</td>
+                    <td>{{ row.xi }}</td>
+                    <td>{{ row.f_xi }}</td>
+                    <td>{{ row.Error }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center">
+        <a href="data:text/csv;base64,{{ csv }}" download="puntofijo_resultados.csv" class="btn btn-success" style="background-color: #db3f59; border-color: #db3f59">Descargar CSV</a>
+        </div>
+    {% endif %}
+{% endif %}
+</div>
+{% endblock %}

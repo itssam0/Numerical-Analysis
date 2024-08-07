@@ -1,0 +1,80 @@
+/* calculator/static/css/base.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.container {
+    padding: 20px;
+}
+
+h1 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.method-box {
+    display: inline-block;
+    padding: 15px 25px;
+    margin: 10px;
+    background-color: white;
+    border: 2px solid #db3f59;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: #db3f59;
+    font-size: 1.1rem;
+    transition: background-color 0.3s, color 0.3s;
+    width: 200px; /* Ancho fijo para que todas las cajitas tengan el mismo tamaño */
+}
+
+.method-box:hover {
+    background-color: #db3f59;
+    color: white;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.gap-3 {
+    gap: 1rem;
+}
+
+/* Estilos adicionales para biseccion.html */
+.title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #db3f59;
+    
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 32px;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 15px;
+    text-align: center;
+}
